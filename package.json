@@ -1,0 +1,16 @@
+{
+  "name": "copy-project",
+  "version": "0.1.0",
+  "description": "copy a sharelatex project from one database to another (for debugging)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "dependencies": {
+    "async": "^0.9.0",
+    "minimist": "^1.1.0",
+    "mongojs": "^0.18.1",
+    "underscore": "^1.7.0"
+  }
+}

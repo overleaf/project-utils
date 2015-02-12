@@ -18,7 +18,7 @@ dbNew = mongojs.connect argv.to, collections
 
 # walk an object from mongo looking for object ids, call 'action' when an objectid is found
 walk = (obj, path, action) ->
-	val = if typeof obj == 'string' && obj.match(/$[0-9a-f]{24}$/) then ObjectId obj else obj
+	val = if typeof obj == 'string' && obj.match(/^[0-9a-f]{24}$/) then ObjectId(obj )else obj
 	if val instanceof ObjectId
 		return action val, path
 	else if _.isArray val

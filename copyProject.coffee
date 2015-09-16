@@ -74,17 +74,20 @@ copyFromCollection 'projects', {_id:project_id}, (err, doc) ->
 		(callback) ->
 			copyFromCollection('projectHistoryMetaData', projectQuery, callback)
 		(callback) ->
-			copyFromCollection('docHistory', projectQuery, callback)
-		(callback) ->
-			async.eachSeries userids, (id, callback) ->
-				copyFromCollection('users', {_id:id}, callback)
+			async.eachSeries docids.sort(), (doc_id, cb) ->
+				copyFromCollection('docs', {_id:doc_id}, cb)
 			, callback
 		(callback) ->
-			async.eachSeries docids, (doc_id, callback) ->
-				async.series [
-					(cb) ->	copyFromCollection('docs', {_id:doc_id}, cb),
-					(cb) -> copyFromCollection('docOps', {doc_id:doc_id}, cb)
-				], callback
+			async.eachSeries docids.sort(), (doc_id, cb) ->
+				copyFromCollection('docOps', {doc_id:doc_id}, cb)
+			, callback
+		(callback) ->
+			async.eachSeries docids.sort(), (doc_id, cb) ->
+				copyFromCollection('docHistory', {doc_id:doc_id}, cb)
+			, callback
+		(callback) ->
+			async.eachSeries userids.sort(), (id, callback) ->
+				copyFromCollection('users', {_id:id}, callback)
 			, callback
 	], (err, result) ->
 		if err?

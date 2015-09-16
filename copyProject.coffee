@@ -14,7 +14,7 @@ console.log 'copying project', project_id
 
 collections = ["projects", "users", "docs", "docOps", "docHistory", "projectHistoryMetaData"]
 dbOld = mongojs.connect argv.from, collections
-dbNew = mongojs.connect argv.to, collections
+dbNew = mongojs.connect argv.to, collections if argv.to?
 
 # walk an object from mongo looking for object ids, call 'action' when an objectid is found
 walk = (obj, path, action) ->
@@ -48,12 +48,24 @@ docAction = (obj, path) ->
 
 copyFromCollection = (collection, query, callback) ->
 	console.log 'copying', collection, query
-	dbOld[collection].find query, (err, doc) ->
-		return callback(err,doc) if doc.length == 0 # early return, if no docs found
-		walk doc, collection, docAction
-		dbNew[collection].remove query, (err, result) ->
-			dbNew[collection].insert doc, (err, result) ->
-				callback(err, result)
+	dbOld[collection].find(query).sort {_id:1}, (err, doc) ->
+		if doc.length == 0 # early return, if no docs found
+			if dbNew?
+				dbNew[collection].remove query, (err, result) ->
+					callback(err,result)
+				return
+			else
+				return callback(err)
+		else
+			walk doc, collection, docAction
+			if dbNew?
+				dbNew[collection].remove query, (err, result) ->
+					return callback(err) if err?
+					dbNew[collection].insert doc, (err, result) ->
+						return callback(err, result)
+			else
+				console.log doc
+				return callback(err)
 
 projectQuery = {project_id:project_id}
 
@@ -80,4 +92,4 @@ copyFromCollection 'projects', {_id:project_id}, (err, doc) ->
 		else
 			console.log 'done'
 		dbOld.close()
-		dbNew.close()
+		dbNew.close() if dbNew?

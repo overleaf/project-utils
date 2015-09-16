@@ -12,6 +12,13 @@ Example
 will copy project 54899d081ddd78e2491e75ca from the mongo database
 `sharelatex` to `sharelatex-test` on `localhost`
 
+To send the data to stdout, omit the target database
+
+    $ coffee copyProject.coffee --from="mongodb://localhost:27017/sharelatex" 54899d081ddd78e2491e75ca > log
+
+This can be useful for comparing project states before and after an
+operation.
+
 Notes
 -----
 
